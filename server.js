@@ -8,7 +8,7 @@ const server = http.createServer(app);
 // Set up Socket.IO
 const io = new Server(server, {
     cors: {
-        origin: "*", // Adjust this to your frontend origin in production
+        origin: "https://collaborative-code-editor-beta.vercel.app", // Adjust this to your frontend origin in production
         methods: ["GET", "POST"],
     },
 });

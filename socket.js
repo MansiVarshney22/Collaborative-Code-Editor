@@ -1,6 +1,7 @@
 import { io } from "socket.io-client";
 
 export const initSocket = async () => {
+    const backendURL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
     const options = {
         'force new connection': true,
         reconnectionAttempt: Infinity,
@@ -8,5 +9,5 @@ export const initSocket = async () => {
         transports: ['websocket']
     }
     
-    return io(import.meta.env.VITE_BACKEND_URL, options)
+    return io(backendURL, options)
 }

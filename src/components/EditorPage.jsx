@@ -23,7 +23,9 @@ const EditorPage = () => {
   };
 
   useEffect(() => {
+    console.log("EditorPage mounted ✅");
     const init = async () => {
+      console.log("Calling initSocket() ✅", initSocket);
       socketRef.current = await initSocket();
       const _socket = socketRef.current;
       _socket.on("connect_error", (err) => handleErrors(err));

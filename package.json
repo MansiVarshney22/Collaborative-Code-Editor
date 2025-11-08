@@ -19,6 +19,7 @@
     "@mui/material": "^7.3.4",
     "axios": "^1.13.1",
     "express": "^5.1.0",
+    "lodash": "^4.17.21",
     "nodemon": "^3.1.10",
     "react": "^19.1.1",
     "react-avatar": "^5.0.4",

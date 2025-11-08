@@ -3,13 +3,22 @@ import {Editor} from "@monaco-editor/react";
 import LanguageSelector from "./LanguageSelector";
 import ACTIONS, {CODE_SNIPPETS} from "../../common";
 import OutputBox from "./OutputBox";
+import {debounce} from "lodash";
 
 function CodeEditor({socketRef, roomId, onCodeChange, languageRef}) {
   const editorRef = useRef(null);
+  const isRemoteUpdate = useRef(false);
   const [language, setLanguage] = useState(
     languageRef?.current || "javascript"
   );
 
+  const emitChange = useRef(
+    debounce((code) => {
+      if (socketRef.current) {
+        socketRef.current.emit(ACTIONS.CODE_CHANGE, {roomId, code});
+      }
+    }, 300)
+  ).current;
   const onMount = (editor) => {
     editorRef.current = editor;
     editor.focus();
@@ -19,11 +28,10 @@ function CodeEditor({socketRef, roomId, onCodeChange, languageRef}) {
       socketRef.current.emit(ACTIONS.REQUEST_SYNC, {roomId});
     }
     editor.onDidChangeModelContent(() => {
+      if (isRemoteUpdate.current) return;
       const code = editor.getValue();
-      if (socketRef.current) {
-        socketRef.current.emit(ACTIONS.CODE_CHANGE, {roomId, code});
-      }
       onCodeChange(code);
+      emitChange(code);
     });
   };
 
@@ -36,7 +44,11 @@ function CodeEditor({socketRef, roomId, onCodeChange, languageRef}) {
       console.log("object", code);
       if (code && editorRef.current) {
         const current = editorRef.current.getValue();
-        if (current !== code) editorRef.current.setValue(code);
+        if (current !== code) {
+          isRemoteUpdate.current = true; // 👈 flag this as a remote update
+          editorRef.current.setValue(code);
+          isRemoteUpdate.current = false; // 👈 reset flag after setting
+        }
       }
     };
     const handleLanguageChange = ({language}) => {
